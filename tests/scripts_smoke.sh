@@ -1354,6 +1354,54 @@ test_chrome_plugin_staging() {
     assert_contains "$output_log" "Chrome plugin staged from upstream DMG"
 }
 
+test_chrome_marketplace_fallback_synthesis() {
+    info "Checking Chrome marketplace fallback synthesis when upstream omits chrome"
+    local workspace="$TMP_DIR/chrome-marketplace-fallback"
+    local app_dir="$workspace/Codex.app"
+    local install_dir="$workspace/install"
+    local output_log="$workspace/output.log"
+    local marketplace="$install_dir/resources/plugins/openai-bundled/.agents/plugins/marketplace.json"
+
+    mkdir -p "$workspace" "$install_dir/resources"
+    make_fake_chrome_upstream_app "$app_dir"
+
+    # Upstream marketplace.json lists no chrome entry — exercises the
+    # synthesized-fallback path in write_bundled_plugins_marketplace.
+    cat > "$app_dir/Contents/Resources/plugins/openai-bundled/.agents/plugins/marketplace.json" <<'JSON'
+{"plugins":[{"name":"browser-use","source":{"source":"local","path":"./plugins/browser-use"},"policy":{"installation":"AVAILABLE"}}]}
+JSON
+
+    # Distinctive name + category prove the synthesized entry actually
+    # reads the staged plugin.json rather than reusing hardcoded values.
+    cat > "$app_dir/Contents/Resources/plugins/openai-bundled/plugins/chrome/.codex-plugin/plugin.json" <<'JSON'
+{"name":"chrome-fallback-test","version":"9.9.9","interface":{"category":"FallbackCategory"}}
+JSON
+
+    (
+        SCRIPT_DIR="$REPO_DIR"
+        INSTALL_DIR="$install_dir"
+        WORK_DIR="$workspace/work"
+        ARCH="x86_64"
+        ICON_SOURCE="$workspace/missing-icon.png"
+        CODEX_APP_ID="codex-desktop"
+        mkdir -p "$WORK_DIR"
+        warn() { echo "[WARN] $*" >&2; }
+        info() { echo "[INFO] $*" >&2; }
+        # shellcheck disable=SC1091
+        source "$REPO_DIR/scripts/lib/bundled-plugins.sh"
+        stage_linux_computer_use_plugin() { return 1; }
+        install_bundled_plugin_resources "$app_dir"
+    ) >"$output_log" 2>&1
+
+    assert_file_exists "$marketplace"
+    assert_contains "$marketplace" '"name": "chrome-fallback-test"'
+    assert_contains "$marketplace" '"category": "FallbackCategory"'
+    assert_contains "$marketplace" '"path": "./plugins/chrome"'
+    assert_contains "$marketplace" '"installation": "AVAILABLE"'
+    assert_contains "$marketplace" '"authentication": "ON_INSTALL"'
+    assert_not_contains "$marketplace" "Bundled marketplace does not contain chrome plugin"
+}
+
 test_chrome_native_host_manifest_writer() {
     info "Checking Chrome native host manifest writer"
     local workspace="$TMP_DIR/chrome-native-host-manifest"
@@ -2622,6 +2670,7 @@ main() {
     test_browser_use_node_repl_glibc_pidfd_patch_static
     test_browser_use_node_repl_ldd_output_compatibility
     test_chrome_plugin_staging
+    test_chrome_marketplace_fallback_synthesis
     test_chrome_native_host_manifest_writer
     test_launcher_template_sanity
     test_side_by_side_launcher_identity

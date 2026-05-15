@@ -682,10 +682,48 @@ if (includeBrowser) {
 
 if (includeChrome) {
   const chrome = sourcePlugins.find((plugin) => plugin.name === "chrome");
-  if (chrome == null) {
-    throw new Error("Bundled marketplace does not contain chrome plugin");
+  if (chrome != null) {
+    plugins.push(chrome);
+  } else {
+    let name = "chrome";
+    let category = "Productivity";
+    const stagedManifestPath = path.join(
+      path.dirname(destinationPath),
+      "..",
+      "..",
+      "plugins",
+      "chrome",
+      ".codex-plugin",
+      "plugin.json",
+    );
+    try {
+      const manifest = JSON.parse(fs.readFileSync(stagedManifestPath, "utf8"));
+      if (typeof manifest.name === "string" && manifest.name.length > 0) {
+        name = manifest.name;
+      }
+      const manifestCategory =
+        manifest && manifest.interface ? manifest.interface.category : undefined;
+      if (typeof manifestCategory === "string" && manifestCategory.length > 0) {
+        category = manifestCategory;
+      }
+    } catch (_err) {
+      // Fall through to defaults when the staged plugin manifest is
+      // missing or malformed — stage_chrome_plugin_from_upstream only
+      // existence-checks plugin.json, so it can still be unparseable here.
+    }
+    plugins.push({
+      name,
+      source: {
+        source: "local",
+        path: "./plugins/chrome",
+      },
+      policy: {
+        installation: "AVAILABLE",
+        authentication: "ON_INSTALL",
+      },
+      category,
+    });
   }
-  plugins.push(chrome);
 }
 
 if (includeComputerUse) {
