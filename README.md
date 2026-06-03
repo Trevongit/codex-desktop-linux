@@ -10,7 +10,9 @@ local AppImage self-builds and Nix, and can install a local update manager that
 rebuilds future Linux packages from newer upstream DMGs.
 
 Before opening a pull request, read [CONTRIBUTING.md](CONTRIBUTING.md). For
-implementation details, see [AGENTS.md](AGENTS.md).
+implementation details, see [AGENTS.md](AGENTS.md). If you are working from a
+fork and want a clean upstream-sync workflow, see
+[Fork And Upstream Workflow](docs/fork-and-upstream-workflow.md).
 
 ## Install By Platform
 

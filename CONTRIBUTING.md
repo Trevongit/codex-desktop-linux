@@ -46,6 +46,11 @@ Before opening a new issue or pull request:
 - gather as much context as possible, especially distro, desktop environment, package format, and exact reproduction steps
 - include logs or command output when relevant
 
+If you are developing from a forked copy of this repository, keep your fork and
+the original upstream repo separate. See
+[Fork And Upstream Workflow](docs/fork-and-upstream-workflow.md) for the
+recommended remote layout, update flow, and rollback pattern.
+
 Good issue reports usually include:
 
 - distro and version
