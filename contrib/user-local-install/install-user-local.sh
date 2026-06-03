@@ -137,11 +137,13 @@ EOF
     mkdir -p "$user_desktop_dir"
     codex_desktop_write_user_local_entry \
         "${FILES_DIR}/.local/share/applications/codex-desktop.desktop" \
-        "${user_desktop_dir}/Codex Desktop Linux.desktop" \
+        "${user_desktop_dir}/Codex Desktop Linux Local.desktop" \
         "${HOME}"
-    sed -i 's/^Name=Codex Desktop$/Name=Codex Desktop Linux/' \
-        "${user_desktop_dir}/Codex Desktop Linux.desktop"
-    chmod 0755 "${user_desktop_dir}/Codex Desktop Linux.desktop"
+    sed -i 's/^Name=Codex Desktop$/Name=Codex Desktop Linux (Local)/' \
+        "${user_desktop_dir}/Codex Desktop Linux Local.desktop"
+    sed -i 's/^Comment=.*/Comment=Start your local Codex Desktop Linux install/' \
+        "${user_desktop_dir}/Codex Desktop Linux Local.desktop"
+    chmod 0755 "${user_desktop_dir}/Codex Desktop Linux Local.desktop"
 
     copy_file "${FILES_DIR}/.config/systemd/user/codex-desktop-update.service" "${systemd_user_dir}/codex-desktop-update.service"
     copy_file "${FILES_DIR}/.config/systemd/user/codex-desktop-update.timer" "${systemd_user_dir}/codex-desktop-update.timer"

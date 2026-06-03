@@ -8,7 +8,8 @@ It adds:
 - self-contained maintenance scripts under `~/.local/opt/codex-desktop-linux/bin`
 - thin launch/check/update/version wrappers under `~/.local/bin`
 - a desktop entry under `~/.local/share/applications`
-- a desktop shortcut on the user's Desktop when that folder is available
+- a desktop shortcut on the user's Desktop when that folder is available, named
+  `Codex Desktop Linux Local`
 - an icon extracted from the local `Codex.dmg`
 - metadata tracking for the wrapper repo and cached `Codex.dmg`
 - an optional weekly `systemd --user` timer for unattended update checks and rebuilds (opt-in)
@@ -76,6 +77,7 @@ The installer:
 6. enables the weekly timer only if `--enable-timer` was passed
 7. refreshes desktop metadata if available
 8. writes a desktop shortcut to the user's Desktop when that folder exists
+   using the `Codex Desktop Linux Local` label
 9. records local metadata and extracts the icon if `Codex.dmg` already exists
 
 ## Commands
