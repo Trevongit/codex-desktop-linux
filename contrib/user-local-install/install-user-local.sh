@@ -61,6 +61,20 @@ CODEX_USER_LOCAL_OZONE_PLATFORM=$(printf '%q' "$USER_LOCAL_OZONE_PLATFORM_SETTIN
 EOF
 }
 
+desktop_dir() {
+    local desktop_path=""
+
+    if command -v xdg-user-dir >/dev/null 2>&1; then
+        desktop_path="$(xdg-user-dir DESKTOP 2>/dev/null || true)"
+    fi
+
+    if [ -z "$desktop_path" ] || [ "$desktop_path" = "$HOME" ]; then
+        desktop_path="${HOME}/Desktop"
+    fi
+
+    printf '%s\n' "$desktop_path"
+}
+
 repo_origin_url() {
     if [ -d "${SOURCE_REPO_ROOT}/.git" ]; then
         git -C "$SOURCE_REPO_ROOT" remote get-url origin 2>/dev/null || true
@@ -117,6 +131,17 @@ EOF
         "${FILES_DIR}/.local/share/applications/codex-desktop.desktop" \
         "${HOME}/.local/share/applications/codex-desktop.desktop" \
         "${HOME}"
+
+    local user_desktop_dir
+    user_desktop_dir="$(desktop_dir)"
+    mkdir -p "$user_desktop_dir"
+    codex_desktop_write_user_local_entry \
+        "${FILES_DIR}/.local/share/applications/codex-desktop.desktop" \
+        "${user_desktop_dir}/Codex Desktop Linux.desktop" \
+        "${HOME}"
+    sed -i 's/^Name=Codex Desktop$/Name=Codex Desktop Linux/' \
+        "${user_desktop_dir}/Codex Desktop Linux.desktop"
+    chmod 0755 "${user_desktop_dir}/Codex Desktop Linux.desktop"
 
     copy_file "${FILES_DIR}/.config/systemd/user/codex-desktop-update.service" "${systemd_user_dir}/codex-desktop-update.service"
     copy_file "${FILES_DIR}/.config/systemd/user/codex-desktop-update.timer" "${systemd_user_dir}/codex-desktop-update.timer"
