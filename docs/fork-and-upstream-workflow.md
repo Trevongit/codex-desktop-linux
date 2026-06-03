@@ -60,22 +60,17 @@ the feature branch and do not push.
 Before syncing a larger upstream change, create a backup branch:
 
 ```bash
-git branch backup-before-upstream-sync
+make backup-sync
 ```
 
-If the update is not acceptable, roll back to that saved point:
+If the update is not acceptable, roll back to the saved branch name:
 
 ```bash
 git switch main
-git reset --hard backup-before-upstream-sync
+git reset --hard backup-YYYYMMDD-HHMMSS
 ```
 
-If you want a simple recovery point before every sync, create a timestamped
-backup branch first:
-
-```bash
-git branch "backup-$(date +%Y%m%d-%H%M%S)"
-```
+Use the exact backup branch name printed by `make backup-sync`.
 
 ## Local Shortcuts In This Repo
 
@@ -89,6 +84,7 @@ The repository also provides matching `make` targets:
 
 ```bash
 make sync-upstream
+make backup-sync
 make publish-fork
 ```
 

@@ -60,7 +60,7 @@ if [ -z "$$format" ]; then \
 fi; \
 printf '%s\n' "$$format"
 
-.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native rebuild-next run-app build-dev-app run-dev-app sync-upstream publish-fork deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
+.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native rebuild-next run-app build-dev-app run-dev-app sync-upstream backup-sync publish-fork deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
 
 help:
 	@printf '\nCodex Desktop Linux Make Targets\n\n'
@@ -82,6 +82,7 @@ help:
 	@printf '  %-18s %s\n' "make build-dev-app" "Build a side-by-side test app with a distinct app id/bin"
 	@printf '  %-18s %s\n' "make run-dev-app" "Launch the side-by-side test app"
 	@printf '  %-18s %s\n' "make sync-upstream" "Fetch upstream and fast-forward main from ilysenko/codex-desktop-linux"
+	@printf '  %-18s %s\n' "make backup-sync" "Create a timestamped backup branch before syncing"
 	@printf '  %-18s %s\n' "make publish-fork" "Push the current branch to the Trevongit fork"
 	@printf '  %-18s %s\n' "make deb" "Build the Debian package into dist/"
 	@printf '  %-18s %s\n' "make rpm" "Build the RPM package into dist/ (Fedora/openSUSE)"
@@ -124,6 +125,7 @@ help:
 	@printf '  %s\n' "make build-dev-app"
 	@printf '  %s\n' "./bin/codex-cua-lab"
 	@printf '  %s\n' "make sync-upstream"
+	@printf '  %s\n' "make backup-sync"
 	@printf '  %s\n' "make publish-fork"
 	@printf '  %s\n' "make deb PACKAGE_VERSION=2026.03.24.220723+88f07cd3"
 	@printf '  %s\n' "make rpm PACKAGE_VERSION=2026.03.24.220723+88f07cd3"
@@ -238,6 +240,12 @@ sync-upstream:
 	git fetch upstream --prune
 	git switch main
 	git pull --ff-only upstream main
+
+backup-sync:
+	@backup_branch="backup-$$(date +%Y%m%d-%H%M%S)"; \
+	echo "[make] Creating backup branch $$backup_branch"; \
+	git branch "$$backup_branch"; \
+	echo "[make] Backup branch created: $$backup_branch"
 
 publish-fork:
 	@echo "[make] Pushing current branch to fork"
