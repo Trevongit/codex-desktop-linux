@@ -60,7 +60,7 @@ if [ -z "$$format" ]; then \
 fi; \
 printf '%s\n' "$$format"
 
-.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native rebuild-next run-app build-dev-app run-dev-app deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
+.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native rebuild-next run-app build-dev-app run-dev-app sync-upstream publish-fork deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
 
 help:
 	@printf '\nCodex Desktop Linux Make Targets\n\n'
@@ -81,6 +81,8 @@ help:
 	@printf '  %-18s %s\n' "make run-app" "Launch the local generated Electron app from codex-app/"
 	@printf '  %-18s %s\n' "make build-dev-app" "Build a side-by-side test app with a distinct app id/bin"
 	@printf '  %-18s %s\n' "make run-dev-app" "Launch the side-by-side test app"
+	@printf '  %-18s %s\n' "make sync-upstream" "Fetch upstream and fast-forward main from ilysenko/codex-desktop-linux"
+	@printf '  %-18s %s\n' "make publish-fork" "Push the current branch to the Trevongit fork"
 	@printf '  %-18s %s\n' "make deb" "Build the Debian package into dist/"
 	@printf '  %-18s %s\n' "make rpm" "Build the RPM package into dist/ (Fedora/openSUSE)"
 	@printf '  %-18s %s\n' "make pacman" "Build the pacman package into dist/ (Arch)"
@@ -121,6 +123,8 @@ help:
 	@printf '  %s\n' "make run-app"
 	@printf '  %s\n' "make build-dev-app"
 	@printf '  %s\n' "./bin/codex-cua-lab"
+	@printf '  %s\n' "make sync-upstream"
+	@printf '  %s\n' "make publish-fork"
 	@printf '  %s\n' "make deb PACKAGE_VERSION=2026.03.24.220723+88f07cd3"
 	@printf '  %s\n' "make rpm PACKAGE_VERSION=2026.03.24.220723+88f07cd3"
 	@printf '  %s\n' "MAX_BUILD_THREADS=8 make install-native"
@@ -228,6 +232,16 @@ build-dev-app:
 run-dev-app:
 	@echo "[make] Launching side-by-side Electron app"
 	"$(DEV_APP_BIN)"
+
+sync-upstream:
+	@echo "[make] Syncing main from upstream"
+	git fetch upstream --prune
+	git switch main
+	git pull --ff-only upstream main
+
+publish-fork:
+	@echo "[make] Pushing current branch to fork"
+	git push -u origin HEAD
 
 deb: maybe-build-updater
 	@echo "[make] Building Debian package"

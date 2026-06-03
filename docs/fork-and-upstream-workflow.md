@@ -85,6 +85,15 @@ This workspace is configured with these aliases:
 - `git publish-fork` — push the current branch to your fork
 - `git rollback-local` — restore the saved backup point used in this workspace
 
+The repository also provides matching `make` targets:
+
+```bash
+make sync-upstream
+make publish-fork
+```
+
+These are the preferred shortcuts for day-to-day use in this repo.
+
 ## Practical Rule
 
 Only one GitHub repo should receive your custom changes:
