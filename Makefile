@@ -60,7 +60,7 @@ if [ -z "$$format" ]; then \
 fi; \
 printf '%s\n' "$$format"
 
-.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native rebuild-next run-app build-dev-app run-dev-app sync-upstream backup-sync publish-fork deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
+.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native rebuild-next run-app build-dev-app run-dev-app sync-upstream backup-sync publish-fork status-all deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
 
 help:
 	@printf '\nCodex Desktop Linux Make Targets\n\n'
@@ -84,6 +84,7 @@ help:
 	@printf '  %-18s %s\n' "make sync-upstream" "Fetch upstream and fast-forward main from ilysenko/codex-desktop-linux"
 	@printf '  %-18s %s\n' "make backup-sync" "Create a timestamped backup branch before syncing"
 	@printf '  %-18s %s\n' "make publish-fork" "Push the current branch to the Trevongit fork"
+	@printf '  %-18s %s\n' "make status-all" "Show repo sync state, fork divergence, and updater status"
 	@printf '  %-18s %s\n' "make deb" "Build the Debian package into dist/"
 	@printf '  %-18s %s\n' "make rpm" "Build the RPM package into dist/ (Fedora/openSUSE)"
 	@printf '  %-18s %s\n' "make pacman" "Build the pacman package into dist/ (Arch)"
@@ -127,6 +128,7 @@ help:
 	@printf '  %s\n' "make sync-upstream"
 	@printf '  %s\n' "make backup-sync"
 	@printf '  %s\n' "make publish-fork"
+	@printf '  %s\n' "make status-all"
 	@printf '  %s\n' "make deb PACKAGE_VERSION=2026.03.24.220723+88f07cd3"
 	@printf '  %s\n' "make rpm PACKAGE_VERSION=2026.03.24.220723+88f07cd3"
 	@printf '  %s\n' "MAX_BUILD_THREADS=8 make install-native"
@@ -338,6 +340,26 @@ service-enable:
 service-status:
 	@echo "[make] Showing codex-update-manager.service status"
 	systemctl --user status codex-update-manager.service --no-pager
+
+status-all:
+	@echo "[make] Repo status"
+	@git fetch upstream --prune >/dev/null 2>&1 || true
+	@git fetch origin --prune >/dev/null 2>&1 || true
+	@local_head="$$(git rev-parse --short HEAD)"; \
+	upstream_head="$$(git rev-parse --short upstream/main 2>/dev/null || echo unknown)"; \
+	fork_head="$$(git rev-parse --short origin/main 2>/dev/null || echo unknown)"; \
+	ahead_behind="$$(git rev-list --left-right --count main...upstream/main 2>/dev/null || echo 'unknown unknown')"; \
+	ahead="$${ahead_behind%% *}"; behind="$${ahead_behind##* }"; \
+	echo "  local main:    $$local_head"; \
+	echo "  upstream/main: $$upstream_head"; \
+	echo "  origin/main:   $$fork_head"; \
+	echo "  diff vs upstream: $$ahead ahead, $$behind behind"; \
+	echo "[make] Updater status"; \
+	if command -v codex-update-manager >/dev/null 2>&1; then \
+		codex-update-manager status --json 2>/dev/null || codex-update-manager status 2>/dev/null || true; \
+	else \
+		echo "  codex-update-manager not found"; \
+	fi
 
 clean-dist:
 	@echo "[make] Removing dist/"

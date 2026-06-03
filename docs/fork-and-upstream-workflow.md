@@ -86,9 +86,16 @@ The repository also provides matching `make` targets:
 make sync-upstream
 make backup-sync
 make publish-fork
+make status-all
 ```
 
 These are the preferred shortcuts for day-to-day use in this repo.
+
+`make status-all` is the quickest way to see:
+
+- whether your local repo is ahead or behind `ilysenko/main`
+- whether your fork has the same tip as your local branch
+- whether `codex-update-manager` reports a ready or pending update
 
 ## Practical Rule
 
