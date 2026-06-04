@@ -98,6 +98,7 @@ These are the preferred shortcuts for day-to-day use in this repo.
 - your local repo versus `ilysenko/main`
 - your fork versus your local branch
 - the installed updater state
+- any stale Codex thread approval modes that need repair
 - current Codex/OpenAI release-note highlights
 
 `make deploy` is the one-command machine setup for a cloned repo. It installs
@@ -109,6 +110,8 @@ new machine state.
 - whether your local repo is ahead or behind `ilysenko/main`
 - whether your fork has the same tip as your local branch
 - whether `codex-update-manager` reports a ready or pending update
+- whether your local Codex thread state still carries old `granular`
+  approval records
 
 ## Practical Rule
 
@@ -119,3 +122,7 @@ Only one GitHub repo should receive your custom changes:
 
 That separation keeps update flow predictable and avoids accidental pushes back
 to the original project.
+
+The launcher repairs legacy thread approval records in `~/.codex` on cold start
+so old `granular` state does not keep breaking prompt submission after a
+restart.

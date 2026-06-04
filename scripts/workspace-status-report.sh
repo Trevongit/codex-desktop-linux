@@ -79,6 +79,49 @@ PY
     fi
 }
 
+report_thread_state() {
+    local state_db="${CODEX_HOME:-$HOME/.codex}/state_5.sqlite"
+
+    if [ ! -f "$state_db" ]; then
+        printf '  legacy thread approvals: no Codex state database found\n'
+        return 0
+    fi
+
+    python3 - "$state_db" <<'PY'
+import sqlite3
+import sys
+
+path = sys.argv[1]
+try:
+    conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+except sqlite3.Error as exc:
+    print(f"  legacy thread approvals: unavailable ({exc})")
+    raise SystemExit(0)
+
+try:
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT COUNT(*) FROM threads WHERE approval_mode LIKE '%granular%'"
+    )
+    count = int(cur.fetchone()[0] or 0)
+    if count == 0:
+        print("  legacy thread approvals: clean")
+        raise SystemExit(0)
+
+    cur.execute(
+        "SELECT title, cwd FROM threads WHERE approval_mode LIKE '%granular%' ORDER BY updated_at_ms DESC LIMIT 3"
+    )
+    rows = cur.fetchall()
+    print(f"  legacy thread approvals: {count} thread(s) need repair")
+    for title, cwd in rows:
+        label = title.strip() if isinstance(title, str) and title.strip() else "(untitled thread)"
+        location = cwd or "unknown cwd"
+        print(f"    - {label} @ {location}")
+finally:
+    conn.close()
+PY
+}
+
 summarize_url() {
     local label="$1"
     local url="$2"
@@ -139,6 +182,9 @@ report_repo_state
 
 print_section "Updater"
 report_updater_state
+
+print_section "Codex State"
+report_thread_state
 
 print_section "OpenAI"
 summarize_url \

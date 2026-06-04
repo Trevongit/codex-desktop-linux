@@ -313,6 +313,50 @@ clear_bundled_marketplace_tmp_cache() {
     done
 }
 
+repair_legacy_thread_approval_modes() {
+    local codex_home="${CODEX_HOME:-$HOME/.codex}"
+    local state_db="$codex_home/state_5.sqlite"
+
+    [ -f "$state_db" ] || return 0
+    command -v python3 >/dev/null 2>&1 || return 0
+
+    python3 - "$state_db" <<'PY'
+import sqlite3
+import sys
+
+path = sys.argv[1]
+try:
+    conn = sqlite3.connect(path)
+except sqlite3.Error:
+    raise SystemExit(0)
+
+try:
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT COUNT(*) FROM threads WHERE approval_mode LIKE '%granular%'")
+        count = int(cur.fetchone()[0] or 0)
+    except sqlite3.Error:
+        raise SystemExit(0)
+
+    if count == 0:
+        raise SystemExit(0)
+
+    try:
+        cur.execute("BEGIN IMMEDIATE")
+        cur.execute(
+            "UPDATE threads SET approval_mode = 'on-request' WHERE approval_mode LIKE '%granular%'"
+        )
+        conn.commit()
+    except sqlite3.Error:
+        conn.rollback()
+        raise SystemExit(0)
+
+    print(f"Repaired {count} legacy thread approval_mode value(s) in {path}")
+finally:
+    conn.close()
+PY
+}
+
 monitor_bundled_marketplace_tmp_permissions() {
     (
         local i=0
@@ -2429,6 +2473,7 @@ fi
 
 export_packaged_runtime_env
 if needs_cold_start; then
+    repair_legacy_thread_approval_modes
     clear_bundled_marketplace_tmp_cache
     # The runtime marketplace is populated asynchronously and can briefly
     # recreate read-only plugin cache trees before the sync below replaces them.
