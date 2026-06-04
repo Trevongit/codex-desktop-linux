@@ -86,10 +86,18 @@ The repository also provides matching `make` targets:
 make sync-upstream
 make backup-sync
 make publish-fork
+make report
 make status-all
 ```
 
 These are the preferred shortcuts for day-to-day use in this repo.
+
+`make report` is the daily checkup. It summarizes:
+
+- your local repo versus `ilysenko/main`
+- your fork versus your local branch
+- the installed updater state
+- current Codex/OpenAI release-note highlights
 
 `make status-all` is the quickest way to see:
 
