@@ -24,6 +24,17 @@ make deploy
 from a fresh upstream `Codex.dmg`, builds the matching native package, and
 installs the newest artifact from `dist/`.
 
+If `make deploy` or `scripts/install-deps.sh` stops at `sh.rustup.rs`, the
+home machine is usually missing DNS or internet access for the Rust download.
+On Linux Mint, the quick fallback is:
+
+```bash
+sudo apt update
+sudo apt install -y rustc cargo
+```
+
+After that, rerun `make deploy`.
+
 If dependencies are already installed:
 
 ```bash

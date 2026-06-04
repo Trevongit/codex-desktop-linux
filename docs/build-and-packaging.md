@@ -22,6 +22,17 @@ bash scripts/install-deps.sh
 It detects `apt`, `dnf5`, `dnf`, `pacman`, or `zypper`, installs system
 packages, and bootstraps Rust through `rustup` when needed.
 
+If that script stops on `Could not resolve host: sh.rustup.rs`, the machine has
+a network or DNS problem. On Linux Mint, the quickest fallback is:
+
+```bash
+sudo apt update
+sudo apt install -y rustc cargo
+```
+
+Then rerun `make deploy` or `bash scripts/install-deps.sh` once networking is
+working again.
+
 ## Manual Dependencies
 
 ```bash
