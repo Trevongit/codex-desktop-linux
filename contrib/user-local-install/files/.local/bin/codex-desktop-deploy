@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "${HOME}/.local/opt/codex-desktop-linux/lib/codex-desktop-linux/common.sh"
+
+ensure_layout
+load_install_config
+load_metadata
+
+repo_dir="${REPO_DIR:-${SOURCE_REPO_DIR:-}}"
+if [ -z "$repo_dir" ] || [ ! -d "$repo_dir" ]; then
+    echo "Repo checkout not found. Re-run the installer from the Codex Desktop Linux repo checkout." >&2
+    exit 1
+fi
+
+exec make -C "$repo_dir" deploy "$@"

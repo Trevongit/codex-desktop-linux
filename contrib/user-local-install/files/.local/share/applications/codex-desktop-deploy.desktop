@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Codex Desktop Deploy
+Comment=Install Codex Desktop Linux and show the report
+Exec=env BAMF_DESKTOP_FILE_HINT=@HOME@/.local/share/applications/codex-desktop-deploy.desktop CHROME_DESKTOP=codex-desktop-deploy.desktop @HOME@/.local/bin/codex-desktop-deploy
+TryExec=@HOME@/.local/bin/codex-desktop-deploy
+Terminal=true
+Categories=Development;IDE;
+Keywords=codex;openai;deploy;install;linux;
+StartupNotify=true
+Icon=codex-desktop
