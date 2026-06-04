@@ -87,6 +87,7 @@ make sync-upstream
 make backup-sync
 make publish-fork
 make report
+make deploy
 make status-all
 ```
 
@@ -98,6 +99,10 @@ These are the preferred shortcuts for day-to-day use in this repo.
 - your fork versus your local branch
 - the installed updater state
 - current Codex/OpenAI release-note highlights
+
+`make deploy` is the one-command machine setup for a cloned repo. It installs
+Codex Desktop Linux and then prints the report so you can immediately see the
+new machine state.
 
 `make status-all` is the quickest way to see:
 

@@ -60,7 +60,7 @@ if [ -z "$$format" ]; then \
 fi; \
 printf '%s\n' "$$format"
 
-.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native rebuild-next run-app build-dev-app run-dev-app sync-upstream backup-sync publish-fork status-all report deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
+.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native rebuild-next run-app build-dev-app run-dev-app sync-upstream backup-sync publish-fork status-all report deploy deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
 
 help:
 	@printf '\nCodex Desktop Linux Make Targets\n\n'
@@ -85,6 +85,7 @@ help:
 	@printf '  %-18s %s\n' "make backup-sync" "Create a timestamped backup branch before syncing"
 	@printf '  %-18s %s\n' "make publish-fork" "Push the current branch to the Trevongit fork"
 	@printf '  %-18s %s\n' "make report" "Show repo, updater, and OpenAI Codex update highlights"
+	@printf '  %-18s %s\n' "make deploy" "Install Codex Desktop Linux and run the workspace report"
 	@printf '  %-18s %s\n' "make status-all" "Show repo sync state, fork divergence, and updater status"
 	@printf '  %-18s %s\n' "make deb" "Build the Debian package into dist/"
 	@printf '  %-18s %s\n' "make rpm" "Build the RPM package into dist/ (Fedora/openSUSE)"
@@ -130,6 +131,7 @@ help:
 	@printf '  %s\n' "make backup-sync"
 	@printf '  %s\n' "make publish-fork"
 	@printf '  %s\n' "make report"
+	@printf '  %s\n' "make deploy"
 	@printf '  %s\n' "make status-all"
 	@printf '  %s\n' "make deb PACKAGE_VERSION=2026.03.24.220723+88f07cd3"
 	@printf '  %s\n' "make rpm PACKAGE_VERSION=2026.03.24.220723+88f07cd3"
@@ -347,6 +349,9 @@ status-all:
 	bash scripts/workspace-status-report.sh
 
 report: status-all
+
+deploy:
+	bash scripts/deploy-machine.sh
 
 clean-dist:
 	@echo "[make] Removing dist/"

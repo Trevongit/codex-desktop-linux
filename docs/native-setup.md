@@ -13,6 +13,13 @@ cd codex-desktop-linux
 make bootstrap-native
 ```
 
+For a one-command install plus report on any machine that already has the repo
+checked out, use:
+
+```bash
+make deploy
+```
+
 `make bootstrap-native` installs build dependencies, regenerates `codex-app/`
 from a fresh upstream `Codex.dmg`, builds the matching native package, and
 installs the newest artifact from `dist/`.
