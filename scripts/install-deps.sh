@@ -435,17 +435,18 @@ Install 7zz manually from https://www.7-zip.org/download.html and ensure it is o
 # Rust / cargo (via rustup — distro-independent)
 # ---------------------------------------------------------------------------
 install_rust() {
-    # Already on PATH
-    if command -v cargo &>/dev/null; then
+    if [ -x "$HOME/.cargo/bin/cargo" ]; then
+        # Installed by rustup but not yet sourced in this session
+        info "cargo found at ~/.cargo/bin — sourcing environment"
+        # shellcheck source=/dev/null
+        source "$HOME/.cargo/env"
         info "cargo already installed ($(cargo --version))"
         return
     fi
 
-    # Installed by rustup but not yet sourced in this session
-    if [ -x "$HOME/.cargo/bin/cargo" ]; then
-        info "cargo found at ~/.cargo/bin — sourcing environment"
-        # shellcheck source=/dev/null
-        source "$HOME/.cargo/env"
+    # Already on PATH
+    if command -v cargo &>/dev/null; then
+        info "cargo already installed ($(cargo --version))"
         return
     fi
 

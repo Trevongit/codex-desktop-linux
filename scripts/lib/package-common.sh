@@ -434,13 +434,13 @@ updater_binary_is_stale() {
 }
 
 find_cargo_command() {
-    if command -v cargo >/dev/null 2>&1; then
-        command -v cargo
+    if [ -x "$HOME/.cargo/bin/cargo" ]; then
+        echo "$HOME/.cargo/bin/cargo"
         return 0
     fi
 
-    if [ -x "$HOME/.cargo/bin/cargo" ]; then
-        echo "$HOME/.cargo/bin/cargo"
+    if command -v cargo >/dev/null 2>&1; then
+        command -v cargo
         return 0
     fi
 
