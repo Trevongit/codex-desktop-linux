@@ -10,6 +10,8 @@ It adds:
 - a desktop entry under `~/.local/share/applications`
 - a desktop shortcut on the user's Desktop when that folder is available, named
   `Codex Desktop Linux Local`
+- a daily report launcher under `~/.local/share/applications`, plus a Desktop
+  shortcut named `Codex Desktop Report`
 - an icon extracted from the local `Codex.dmg`
 - metadata tracking for the wrapper repo and cached `Codex.dmg`
 - an optional weekly `systemd --user` timer for unattended update checks and rebuilds (opt-in)
@@ -21,7 +23,9 @@ The package is laid out as reusable payload files. The installer copies them int
 - `~/.local/opt/codex-desktop-linux/bin/`
 - `~/.local/opt/codex-desktop-linux/lib/codex-desktop-linux/`
 - `~/.local/bin/` wrappers
+- `~/.local/bin/` report wrapper
 - `files/.local/share/applications/codex-desktop.desktop`
+- `files/.local/share/applications/codex-desktop-report.desktop`
 - `files/.config/systemd/user/codex-desktop-update.service`
 - `files/.config/systemd/user/codex-desktop-update.timer`
 
@@ -32,6 +36,7 @@ If installing manually, copy the files to:
 - `~/.local/opt/codex-desktop-linux/bin/`
 - `~/.local/opt/codex-desktop-linux/lib/codex-desktop-linux/`
 - `~/.local/bin/` wrappers that exec into `~/.local/opt/codex-desktop-linux/bin/`
+- `~/.local/bin/` report wrapper that reads the saved repo path
 - `~/.local/share/applications/`
 - `~/.config/systemd/user/`
 
@@ -76,8 +81,8 @@ The installer:
 5. reloads the user `systemd` daemon if available
 6. enables the weekly timer only if `--enable-timer` was passed
 7. refreshes desktop metadata if available
-8. writes a desktop shortcut to the user's Desktop when that folder exists
-   using the `Codex Desktop Linux Local` label
+8. writes desktop shortcuts to the user's Desktop when that folder exists
+   using the `Codex Desktop Linux Local` and `Codex Desktop Report` labels
 9. records local metadata and extracts the icon if `Codex.dmg` already exists
 
 ## Commands
@@ -89,6 +94,7 @@ codex-desktop
 codex-desktop-check-update
 codex-desktop-update
 codex-desktop-version
+codex-desktop-report
 ```
 
 ## Notes

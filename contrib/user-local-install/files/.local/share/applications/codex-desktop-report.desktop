@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Codex Desktop Report
+Comment=Show the daily Codex Desktop Linux status report
+Exec=env BAMF_DESKTOP_FILE_HINT=@HOME@/.local/share/applications/codex-desktop-report.desktop CHROME_DESKTOP=codex-desktop-report.desktop @HOME@/.local/bin/codex-desktop-report
+TryExec=@HOME@/.local/bin/codex-desktop-report
+Terminal=true
+Categories=Development;IDE;
+Keywords=codex;openai;report;status;linux;
+StartupNotify=true
+Icon=codex-desktop

@@ -105,6 +105,7 @@ install_manager_files() {
     copy_file "${FILES_DIR}/.local/bin/codex-desktop-check-update" "${OPT_BIN_DIR}/codex-desktop-check-update"
     copy_file "${FILES_DIR}/.local/bin/codex-desktop-update" "${OPT_BIN_DIR}/codex-desktop-update"
     copy_file "${FILES_DIR}/.local/bin/codex-desktop-version" "${OPT_BIN_DIR}/codex-desktop-version"
+    copy_file "${FILES_DIR}/.local/bin/codex-desktop-report" "${OPT_BIN_DIR}/codex-desktop-report"
 
     cat > "${HOME}/.local/bin/codex-desktop" <<'EOF'
 #!/usr/bin/env bash
@@ -126,10 +127,19 @@ EOF
 set -euo pipefail
 exec "${HOME}/.local/opt/codex-desktop-linux/bin/codex-desktop-version" "$@"
 EOF
+    cat > "${HOME}/.local/bin/codex-desktop-report" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exec "${HOME}/.local/opt/codex-desktop-linux/bin/codex-desktop-report" "$@"
+EOF
 
     codex_desktop_write_user_local_entry \
         "${FILES_DIR}/.local/share/applications/codex-desktop.desktop" \
         "${HOME}/.local/share/applications/codex-desktop.desktop" \
+        "${HOME}"
+    codex_desktop_write_user_local_entry \
+        "${FILES_DIR}/.local/share/applications/codex-desktop-report.desktop" \
+        "${HOME}/.local/share/applications/codex-desktop-report.desktop" \
         "${HOME}"
 
     local user_desktop_dir
@@ -144,6 +154,11 @@ EOF
     sed -i 's/^Comment=.*/Comment=Start your local Codex Desktop Linux install/' \
         "${user_desktop_dir}/Codex Desktop Linux Local.desktop"
     chmod 0755 "${user_desktop_dir}/Codex Desktop Linux Local.desktop"
+    codex_desktop_write_user_local_entry \
+        "${FILES_DIR}/.local/share/applications/codex-desktop-report.desktop" \
+        "${user_desktop_dir}/Codex Desktop Report.desktop" \
+        "${HOME}"
+    chmod 0755 "${user_desktop_dir}/Codex Desktop Report.desktop"
 
     copy_file "${FILES_DIR}/.config/systemd/user/codex-desktop-update.service" "${systemd_user_dir}/codex-desktop-update.service"
     copy_file "${FILES_DIR}/.config/systemd/user/codex-desktop-update.timer" "${systemd_user_dir}/codex-desktop-update.timer"
@@ -162,11 +177,13 @@ EOF
         "${OPT_BIN_DIR}/codex-desktop-check-update" \
         "${OPT_BIN_DIR}/codex-desktop-update" \
         "${OPT_BIN_DIR}/codex-desktop-version" \
+        "${OPT_BIN_DIR}/codex-desktop-report" \
         "${OPT_LIB_DIR}/common.sh" \
         "${HOME}/.local/bin/codex-desktop" \
         "${HOME}/.local/bin/codex-desktop-check-update" \
         "${HOME}/.local/bin/codex-desktop-update" \
-        "${HOME}/.local/bin/codex-desktop-version"
+        "${HOME}/.local/bin/codex-desktop-version" \
+        "${HOME}/.local/bin/codex-desktop-report"
 }
 
 install_manager_files
