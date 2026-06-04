@@ -43,6 +43,28 @@ has_compatible_nodejs() {
         && command -v npx &>/dev/null
 }
 
+cargo_major() {
+    local version major
+
+    command -v cargo &>/dev/null || return 1
+    version="$(cargo -V 2>/dev/null || true)"
+    major="${version##* }"
+    major="${major%%.*}"
+
+    case "$major" in
+        ''|*[!0-9]*) return 1 ;;
+        *) printf '%s\n' "$major" ;;
+    esac
+}
+
+cargo_version_at_least() {
+    local current="$1"
+    local required="$2"
+
+    [ -n "$current" ] || return 1
+    [ "$(printf '%s\n%s\n' "$required" "$current" | sort -V | head -n1)" = "$required" ]
+}
+
 validate_nodejs_major() {
     case "$NODEJS_MAJOR" in
         ''|*[!0-9]*)
@@ -435,19 +457,27 @@ Install 7zz manually from https://www.7-zip.org/download.html and ensure it is o
 # Rust / cargo (via rustup — distro-independent)
 # ---------------------------------------------------------------------------
 install_rust() {
+    local current_version=""
+
     if [ -x "$HOME/.cargo/bin/cargo" ]; then
         # Installed by rustup but not yet sourced in this session
         info "cargo found at ~/.cargo/bin — sourcing environment"
         # shellcheck source=/dev/null
         source "$HOME/.cargo/env"
+        current_version="$(cargo -V 2>/dev/null | awk '{print $2}' || true)"
         info "cargo already installed ($(cargo --version))"
-        return
+        if cargo_version_at_least "$current_version" "1.83.0"; then
+            return
+        fi
     fi
 
-    # Already on PATH
     if command -v cargo &>/dev/null; then
-        info "cargo already installed ($(cargo --version))"
-        return
+        current_version="$(cargo -V 2>/dev/null | awk '{print $2}' || true)"
+        if cargo_version_at_least "$current_version" "1.83.0"; then
+            info "cargo already installed ($(cargo --version))"
+            return
+        fi
+        warn "cargo ${current_version:-unknown} is too old for this repo; installing rustup toolchain"
     fi
 
     info "Installing Rust toolchain via rustup..."
