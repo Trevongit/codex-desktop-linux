@@ -21,6 +21,34 @@ refresh_remotes() {
     git -C "$REPO_DIR" fetch origin --prune >/dev/null 2>&1 || true
 }
 
+legacy_thread_approval_count() {
+    local state_db="${CODEX_HOME:-$HOME/.codex}/state_5.sqlite"
+
+    if [ ! -f "$state_db" ]; then
+        printf '%s\n' "unknown"
+        return 0
+    fi
+
+    python3 - "$state_db" <<'PY'
+import sqlite3
+import sys
+
+path = sys.argv[1]
+try:
+    conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+except sqlite3.Error:
+    print("unknown")
+    raise SystemExit(0)
+
+try:
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM threads WHERE approval_mode LIKE '%granular%'")
+    print(int(cur.fetchone()[0] or 0))
+finally:
+    conn.close()
+PY
+}
+
 report_repo_state() {
     local branch local_head upstream_head origin_head upstream_diff fork_diff upstream_ahead upstream_behind fork_ahead fork_behind
 
@@ -46,6 +74,10 @@ report_repo_state() {
 }
 
 report_updater_state() {
+    UPDATER_STATUS="unknown"
+    UPDATER_READY="unknown"
+    UPDATER_PACKAGE=""
+
     if ! command -v codex-update-manager >/dev/null 2>&1; then
         printf '  codex-update-manager: not installed\n'
         return 0
@@ -54,21 +86,31 @@ report_updater_state() {
     status_output="$(codex-update-manager status --json 2>&1 || true)"
     case "$status_output" in
         \{*)
-            python3 - "$status_output" <<'PY'
-import json, sys
+            eval "$(
+                python3 - "$status_output" <<'PY'
+import json
+import shlex
+import sys
 
 data = json.loads(sys.argv[1])
 status = data.get("status", "unknown")
 state = data.get("state", {})
 update = state.get("update", {})
 ready = update.get("ready", None)
-package = update.get("package_path") or update.get("packagePath") or update.get("path")
-print(f"  status:        {status}")
-if ready is not None:
-    print(f"  update ready:  {ready}")
-if package:
-    print(f"  package:       {package}")
+package = update.get("package_path") or update.get("packagePath") or update.get("path") or ""
+
+print(f"UPDATER_STATUS={shlex.quote(str(status))}")
+print(f"UPDATER_READY={shlex.quote('unknown' if ready is None else ('true' if bool(ready) else 'false'))}")
+print(f"UPDATER_PACKAGE={shlex.quote(str(package))}")
 PY
+            )"
+            printf '  status:        %s\n' "$UPDATER_STATUS"
+            if [ "$UPDATER_READY" != "unknown" ]; then
+                printf '  update ready:  %s\n' "$UPDATER_READY"
+            fi
+            if [ -n "$UPDATER_PACKAGE" ]; then
+                printf '  package:       %s\n' "$UPDATER_PACKAGE"
+            fi
             return 0
             ;;
     esac
@@ -81,6 +123,17 @@ PY
 
 report_thread_state() {
     local state_db="${CODEX_HOME:-$HOME/.codex}/state_5.sqlite"
+    local thread_count
+
+    thread_count="$(legacy_thread_approval_count)"
+    if [ "$thread_count" = "unknown" ]; then
+        printf '  legacy thread approvals: unavailable\n'
+        return 0
+    fi
+    if [ "$thread_count" = "0" ]; then
+        printf '  legacy thread approvals: clean\n'
+        return 0
+    fi
 
     if [ ! -f "$state_db" ]; then
         printf '  legacy thread approvals: no Codex state database found\n'
@@ -120,6 +173,43 @@ try:
 finally:
     conn.close()
 PY
+}
+
+report_next_action() {
+    local upstream_diff fork_diff upstream_ahead upstream_behind fork_ahead fork_behind thread_count
+
+    upstream_diff="$(rev_count HEAD upstream/main)"
+    fork_diff="$(rev_count HEAD origin/main)"
+    set -- $upstream_diff
+    upstream_ahead="${1:-unknown}"
+    upstream_behind="${2:-unknown}"
+    set -- $fork_diff
+    fork_ahead="${1:-unknown}"
+    fork_behind="${2:-unknown}"
+    thread_count="$(legacy_thread_approval_count)"
+
+    if [ "$thread_count" != "unknown" ] && [ "$thread_count" != "0" ]; then
+        printf '  - close Codex Desktop, then reopen it once to let the launcher repair legacy threads\n'
+        printf '  - if you also want the repo refreshed first, run `make easy-update`\n'
+        return 0
+    fi
+
+    if [ "$upstream_behind" != "unknown" ] && [ "$upstream_behind" -gt 0 ] 2>/dev/null; then
+        printf '  - run `make easy-update` to sync from upstream and reinstall\n'
+        return 0
+    fi
+
+    if [ "$fork_ahead" != "unknown" ] && [ "$fork_ahead" -gt 0 ] 2>/dev/null; then
+        printf '  - run `make publish-fork` to save local changes to your fork\n'
+        return 0
+    fi
+
+    if [ "${UPDATER_READY:-unknown}" = "true" ]; then
+        printf '  - install the ready update from Codex Desktop or run `codex-update-manager install-ready`\n'
+        return 0
+    fi
+
+    printf '  - no action required right now\n'
 }
 
 summarize_url() {
@@ -197,6 +287,7 @@ summarize_url \
     codex update mobile release notes app
 
 print_section "Next steps"
+report_next_action
 printf '  - Use `make backup-sync` before syncing upstream\n'
 printf '  - Use `make sync-upstream` to pull the latest wrapper changes\n'
 printf '  - Use `make publish-fork` to save your local improvements to your fork\n'
