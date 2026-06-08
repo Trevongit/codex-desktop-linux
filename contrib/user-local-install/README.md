@@ -14,6 +14,8 @@ It adds:
   shortcut named `Codex Desktop Report`
 - a one-click deploy launcher under `~/.local/share/applications`, plus a
   Desktop shortcut named `Codex Desktop Deploy`
+- a one-click safe update launcher under `~/.local/share/applications`, plus a
+  Desktop shortcut named `Codex Desktop Easy Update`
 - an icon extracted from the local `Codex.dmg`
 - metadata tracking for the wrapper repo and cached `Codex.dmg`
 - an optional weekly `systemd --user` timer for unattended update checks and rebuilds (opt-in)
@@ -27,9 +29,11 @@ The package is laid out as reusable payload files. The installer copies them int
 - `~/.local/bin/` wrappers
 - `~/.local/bin/` report wrapper
 - `~/.local/bin/` deploy wrapper
+- `~/.local/bin/` easy-update wrapper
 - `files/.local/share/applications/codex-desktop.desktop`
 - `files/.local/share/applications/codex-desktop-report.desktop`
 - `files/.local/share/applications/codex-desktop-deploy.desktop`
+- `files/.local/share/applications/codex-desktop-easy-update.desktop`
 - `files/.config/systemd/user/codex-desktop-update.service`
 - `files/.config/systemd/user/codex-desktop-update.timer`
 
@@ -42,6 +46,7 @@ If installing manually, copy the files to:
 - `~/.local/bin/` wrappers that exec into `~/.local/opt/codex-desktop-linux/bin/`
 - `~/.local/bin/` report wrapper that reads the saved repo path
 - `~/.local/bin/` deploy wrapper that runs `make deploy` from the saved repo
+- `~/.local/bin/` easy-update wrapper that runs `make easy-update` from the saved repo
 - `~/.local/share/applications/`
 - `~/.config/systemd/user/`
 
@@ -87,8 +92,8 @@ The installer:
 6. enables the weekly timer only if `--enable-timer` was passed
 7. refreshes desktop metadata if available
 8. writes desktop shortcuts to the user's Desktop when that folder exists
-   using the `Codex Desktop Linux Local`, `Codex Desktop Report`, and
-   `Codex Desktop Deploy` labels
+   using the `Codex Desktop Linux Local`, `Codex Desktop Report`,
+   `Codex Desktop Deploy`, and `Codex Desktop Easy Update` labels
 9. records local metadata and extracts the icon if `Codex.dmg` already exists
 
 ## Commands
@@ -102,6 +107,7 @@ codex-desktop-update
 codex-desktop-version
 codex-desktop-report
 codex-desktop-deploy
+codex-desktop-easy-update
 ```
 
 ## Notes

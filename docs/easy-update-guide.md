@@ -17,6 +17,9 @@ That will:
 - rebuild and reinstall Codex Desktop Linux
 - print a report at the end
 
+If you installed the user-local shortcuts, you can also launch the same flow
+from the Desktop or menu entry named `Codex Desktop Easy Update`.
+
 ## What To Do After
 
 When the update finishes:

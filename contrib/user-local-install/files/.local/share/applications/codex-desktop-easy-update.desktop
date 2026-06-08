@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Codex Desktop Easy Update
+Comment=Run the safe Codex Desktop Linux update flow
+Exec=env BAMF_DESKTOP_FILE_HINT=@HOME@/.local/share/applications/codex-desktop-easy-update.desktop CHROME_DESKTOP=codex-desktop-easy-update.desktop @HOME@/.local/bin/codex-desktop-easy-update
+TryExec=@HOME@/.local/bin/codex-desktop-easy-update
+Terminal=true
+Categories=Development;IDE;
+Keywords=codex;openai;update;sync;linux;
+StartupNotify=true
+Icon=codex-desktop
