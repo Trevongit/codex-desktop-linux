@@ -84,6 +84,8 @@ cd ~/Apps/COMP/codex-desktop-linux
 make report
 ```
 
+The report now includes a plain-language next step, so you can treat it as the first thing to check before deciding whether to update, restart, or publish.
+
 ## 6. Keep It In Sync
 
 For the easiest safe update path, use:
@@ -127,5 +129,6 @@ For the always-on machine:
 
 - use `make report` for health checks
 - use `make deploy` only when you are bootstrapping or refreshing the install
+- use the report's recommended next step instead of guessing what to do next
 - keep development changes on the travel laptop
 - let the home box stay stable unless you are fixing something specific

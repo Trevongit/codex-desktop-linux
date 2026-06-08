@@ -27,6 +27,7 @@ When the update finishes:
 - close Codex Desktop if it is open
 - start it again from the menu or desktop icon
 - if you want to confirm the state, run `make report`
+- the report now tells you the next recommended action, so you do not need to interpret the status output yourself
 
 ## If It Stops
 
