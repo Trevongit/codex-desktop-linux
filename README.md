@@ -230,6 +230,7 @@ Full list: [Troubleshooting](docs/troubleshooting.md).
 - [Updater](docs/updater.md)
 - [Build and packaging](docs/build-and-packaging.md)
 - [Home machine terminal setup](docs/home-machine-terminal-setup.md)
+- [Easy update guide](docs/easy-update-guide.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Architecture](docs/architecture.md)
 - [GitHub CLI auth in app-launched shells](docs/github-cli-auth.md)

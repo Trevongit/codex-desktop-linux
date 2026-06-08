@@ -86,7 +86,17 @@ make report
 
 ## 6. Keep It In Sync
 
-Before a larger update from the original repo:
+For the easiest safe update path, use:
+
+```bash
+make easy-update
+```
+
+That creates a backup branch, syncs the latest upstream changes, rebuilds the
+app, and prints a report.
+
+If you want to run the steps yourself before a larger update from the original
+repo:
 
 ```bash
 cd ~/Apps/COMP/codex-desktop-linux

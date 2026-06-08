@@ -60,7 +60,7 @@ if [ -z "$$format" ]; then \
 fi; \
 printf '%s\n' "$$format"
 
-.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native rebuild-next run-app build-dev-app run-dev-app sync-upstream backup-sync publish-fork status-all report deploy deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
+.PHONY: help check test build-updater maybe-build-updater update rebuild rebuild-install inspect-upstream build-app build-app-fresh setup-native bootstrap-native install-native update-native easy-update rebuild-next run-app build-dev-app run-dev-app sync-upstream backup-sync publish-fork status-all report deploy deb rpm pacman appimage package install service-enable service-status clean-dist clean-state
 
 help:
 	@printf '\nCodex Desktop Linux Make Targets\n\n'
@@ -77,6 +77,7 @@ help:
 	@printf '  %-18s %s\n' "make bootstrap-native" "Install deps, fresh-build, package, and install"
 	@printf '  %-18s %s\n' "make install-native" "Fresh-build, package, and install"
 	@printf '  %-18s %s\n' "make update-native" "Pull trusted checkout, fresh-build, package, and install"
+	@printf '  %-18s %s\n' "make easy-update" "Backup, sync upstream, reinstall, and report"
 	@printf '  %-18s %s\n' "make rebuild-next" "Build a side-by-side candidate in codex-app-next/"
 	@printf '  %-18s %s\n' "make run-app" "Launch the local generated Electron app from codex-app/"
 	@printf '  %-18s %s\n' "make build-dev-app" "Build a side-by-side test app with a distinct app id/bin"
@@ -122,6 +123,7 @@ help:
 	@printf '  %s\n' "make bootstrap-native"
 	@printf '  %s\n' "make install-native"
 	@printf '  %s\n' "PACKAGE_WITH_UPDATER=0 make update-native"
+	@printf '  %s\n' "make easy-update"
 	@printf '  %s\n' "make inspect-upstream DMG=/tmp/Codex.dmg"
 	@printf '  %s\n' "make rebuild-next DMG=/tmp/Codex.dmg"
 	@printf '  %s\n' "make run-app"
@@ -210,6 +212,10 @@ update-native:
 	@echo "[make] Updating trusted checkout"
 	git pull --ff-only
 	$(MAKE) install-native
+
+easy-update:
+	@echo "[make] Running safe update flow"
+	bash scripts/easy-update.sh
 
 rebuild-next:
 	@echo "[make] Building side-by-side rebuild candidate"
