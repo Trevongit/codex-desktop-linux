@@ -72,8 +72,9 @@ See also the G-CODEX_ROOT_CERTIFICATE_STANDARD.md (principle for runtime/app org
 
 ## 5. Why MD is not pushing this repo
 
-- This repo was already ahead by 19 commits before the certificate commit (now ahead 20 on upstream/main).
-- A push from MD at this stage would include unrelated development history from the prior 19 commits (e.g., report guidance, easy-update launcher/workflow, etc.).
+- At the time of the MD review, this repo was already 19 commits ahead of `upstream/main` before the certificate commit (then 20 ahead of `upstream/main`).
+- Those 19 development commits were already present on Trevor's `origin/main`; they were not additional unpushed commits that a normal push to Trevor's fork would introduce.
+- The repo still had meaningful upstream divergence and engineer-owned history that needed review before any integration or publication decision.
 - The Codex Desktop Linux engineer/workflow (not MD) should review the existing ahead commits and decide how/when to integrate or push them.
 - Per MD push-readiness review (2026-06-14): this repo is classified `🚫 DO NOT PUSH FROM MD — ENGINEER WORKFLOW SHOULD HANDLE`.
 
@@ -84,7 +85,7 @@ MD performed only the local certificate preservation commit (path-specific) and 
 - Review the existing ahead commits (see `git log --oneline --max-count=20` or full history).
 - Confirm the repo is truly the active development root (cross-check with operational evidence: recent builds, local tests, launcher usage, etc.).
 - Decide whether to include `G-CODEX_ROOT_CERTIFICATE.md` in the next normal codex-desktop-linux push/PR (or rebase/squash as appropriate for the workflow).
-- Do not let MD push this repo until the unrelated ahead commits are understood and resolved by the engineer workflow.
+- Keep publication under the engineer workflow until upstream divergence and the intended branch scope are understood.
 - After any push decision, re-verify the certificate is still present and up-to-date.
 - Update this handoff note if the classification or push strategy changes.
 
