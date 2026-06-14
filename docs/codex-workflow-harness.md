@@ -223,6 +223,28 @@ human stop command. Reaching any limit enters `PAUSED_BY_POLICY`.
 - append state transitions, commands, approvals, evidence, and reports to an
   audit log without storing secrets
 
+## Local Organ Registry
+
+Certificates should become a read-only discovery layer for the personal system
+map.
+
+Keep identity and live state separate:
+
+- `G-CODEX_ROOT_CERTIFICATE.md`: human-readable stable identity
+- future `.gcodex/root-certificate.json`: machine-readable stable identity
+- organ registry observation: current path, Git state, duplicate warnings, and
+  other read-only observations
+- harness task state: active work, approvals, and continuation status
+
+The first registry implementation should:
+
+- search only explicit parent roots or explicit paths
+- avoid broad filesystem scans
+- parse existing Markdown certificates so the current system is usable now
+- emit JSON to stdout or another explicit destination
+- warn on absolute-path mismatch, duplicate organ names, and duplicate remotes
+- avoid mutating repositories or user-home state
+
 ## Audit Record
 
 The implementation should persist append-only records with:
@@ -244,21 +266,28 @@ be copied into the audit log by default.
 
 1. Review and accept this policy document.
 2. Define a small, versioned state/event schema with deterministic policy tests.
-3. Build a read-only local evaluator that consumes fixture events and proposes
+3. Build a read-only local organ registry generator with fixture-driven tests.
+4. Build a read-only local evaluator that consumes fixture events and proposes
    `CONTINUE`, `WAIT`, or `STOP`; it performs no actions.
-4. Add an append-only local audit log and duplicate-report guard.
-5. Prototype the Grok/MD session protocol outside core app behavior.
-6. Add authenticated email summaries and pause/status commands before approval
+5. Add an append-only local audit log and duplicate-report guard.
+6. Prototype the Grok/MD session protocol outside core app behavior.
+7. Add authenticated email summaries and pause/status commands before approval
    commands.
-7. Consider an opt-in local Linux feature only after the policy and adapter
+8. Consider an opt-in local Linux feature only after the policy and adapter
    contracts are proven.
-8. Keep the app-server adapter disabled until its interface is verified.
+9. Keep the app-server adapter disabled until its interface is verified.
 
 ## First Implementation Slice
 
-Create a standalone, deterministic policy evaluator with fixture-driven tests.
-It accepts the prior state, declared remaining work, quota evidence, pending
-gates, retry history, and a bounded next-action description. It returns one of:
+Create a standalone, deterministic local organ registry generator with
+fixture-driven tests. It accepts explicit roots, discovers only bounded
+certificate locations, parses the root certificates already in use, adds
+read-only Git observations, and returns JSON with warnings for duplicate or
+stale roots.
+
+The next slice after that is the policy evaluator. It accepts the prior state,
+declared remaining work, quota evidence, pending gates, retry history, and a
+bounded next-action description. It returns one of:
 
 - `CONTINUE` with the approved next slice description
 - `WAIT` with a specific waiting state and recheck condition
